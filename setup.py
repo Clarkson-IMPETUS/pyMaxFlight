@@ -24,12 +24,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     python_requires=">=3.6",
     include_package_data= True,
-    install_requires=[
-        'numpy',
-        'pandas',
-        'panda3d',
-        'panda3d-gltf'
-    ],
+    install_requires=[],
     package_data={
         '': ['Visualization/models/coloredCube.glb']
     }
