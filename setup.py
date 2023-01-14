@@ -4,16 +4,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyMaxFlight-heyjoeway",
+    name="pyMaxFlight-IMPETUS",
     version="0.1.1",
     author="Joseph Judge",
     author_email="judgejc@clarkson.edu",
     description="Python module for interfacing with and processing data from the MaxFlight Motion Client",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/heyjoeway/pyMaxFlight",
+    url="https://github.com/Clarkson-IMPETUS/pyMaxFlight",
     project_urls={
-        "Bug Tracker": "https://github.com/heyjoeway/pyMaxFlight/issues",
+        "Bug Tracker": "https://github.com/Clarkson-IMPETUS/pyMaxFlight/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
