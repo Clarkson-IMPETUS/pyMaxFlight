@@ -5,36 +5,43 @@ try:
     import win32con
     import commctrl
 except:
-    raise Exception("The Interface submodule requires pywin32: pip install pywin32")
+    raise ModuleNotFoundError("The Interface submodule requires pywin32: pip install pywin32")
 
 import functools
+from typing import Iterator
 
-# From winuser.h
-MAKEWPARAM = win32api.MAKELONG
+# Typedef
+HWND = int
 
-def GetListBoxCount(hwnd):
+def _GetCheckboxBool(hwnd: HWND) -> bool:
+    """Gets the status a Win32 Checkbox as a bool. (Checked is True.)"""
+    return bool(win32gui.SendMessage(hwnd, win32con.BM_GETCHECK, 0, 0))
+
+def _GetListBoxCount(hwnd: HWND) -> int:
+    """Gets number of items in a Win32 ListBox."""
     return win32gui.SendMessage(hwnd, win32con.LB_GETCOUNT, 0, 0)
 
-def GetListBoxLine(hwnd, lineNum):
+def _GetListBoxLine(hwnd: HWND, lineNum: int) -> str:
+    """Gets line by index in a Win32 ListBox."""
     lineLen = win32gui.SendMessage(hwnd, win32con.LB_GETTEXTLEN, lineNum, None) * 2
     lineBuffer = win32gui.PyMakeBuffer(lineLen)
     win32gui.SendMessage(hwnd, win32con.LB_GETTEXT, lineNum, lineBuffer)
     return str(lineBuffer, 'utf8')
 
-def GetListBoxRange(hwnd, low: int=None, high: int= None):
+def _GetListBoxRange(hwnd: HWND, low: int=0, high: int= None) -> Iterator[str]:
+    """Gets range of lines by index (inclusive) in a Win32 ListBox."""
+
     if low is None:
         low = 0
 
     if high is None:
-        high = GetListBoxCount(hwnd) - 1
+        high = _GetListBoxCount(hwnd) - 1
 
     for i in range(low, high + 1):
-        yield GetListBoxLine(hwnd, i)
+        yield _GetListBoxLine(hwnd, i)
 
-def SetSlider(hwndDialog, hwndSlider, val: float, horizontal: bool=True):
-    """
-    Sets the position of a Win32 slider and triggers any listeners.
-    """
+def _SetSlider(hwndDialog: HWND, hwndSlider: HWND, val: float, horizontal: bool=True):
+    """Sets the position of a Win32 slider and triggers any listeners."""
 
     retSetPos = win32gui.PostMessage(
         hwndSlider,
@@ -48,14 +55,14 @@ def SetSlider(hwndDialog, hwndSlider, val: float, horizontal: bool=True):
     retThumbPos = win32gui.PostMessage(
         hwndDialog,
         msg,
-        MAKEWPARAM(commctrl.TB_THUMBPOSITION, val),
+        win32api.MAKELONG(commctrl.TB_THUMBPOSITION, val),
         hwndSlider
     )
 
     retThumbTrack = win32gui.PostMessage(
         hwndDialog,
         msg,
-        MAKEWPARAM(win32con.SB_THUMBTRACK, val),
+        win32api.MAKELONG(win32con.SB_THUMBTRACK, val),
         hwndSlider
     )
 
@@ -69,6 +76,7 @@ def SetSlider(hwndDialog, hwndSlider, val: float, horizontal: bool=True):
 class MotionClient:
     """
     Provides an interface to the MaxFlight Motion Client.
+    
     Calling commands without the client open will result in an exception.
     NEVER use the Motion Client fully unattended.
     """
@@ -76,13 +84,21 @@ class MotionClient:
     hwndMotionClientMain = None
     _pid_cache = None
 
-    def init(self):
+    def _init(self):
+        """
+        Obtains handles to Motion Client.
+
+        This is called automatically when using any public functions.
+        This should not be called manually. If this results in latency issues,
+        you may need to refactor this to be public.
+
+        Raises an Exception if Motion Client not open.
+        """
         # Obtained using Spy++
         self.hwndMotionClientMain = win32gui.FindWindow(None, "MFMotion Test Client")
 
         if self.hwndMotionClientMain == 0:
-            self._close()
-            raise Exception("Motion Client not open.")
+            self._error()
 
         self._pid_cache = self._getPID()
 
@@ -128,21 +144,25 @@ class MotionClient:
         self.hwndValueLift              = win32gui.FindWindowEx(self.hwndDialog, self.hwndValueRoll, "Static", None)
 
     def _getPID(self):
+        """Gets process ID of Motion Client."""
         return win32process.GetWindowThreadProcessId(self.hwndMotionClientMain)
 
     def _error(self):
+        """Performs cleanup and raises and Exception."""
         self._close()
         raise Exception("Motion Client not open.")
 
     def _close(self):
+        """Cleans up existing handles and cache."""
         self.hwndMotionClientMain = None
         self._pid_cache = None
 
-    def ifHandleValid(func):
+    def _ifHandleValid(func):
+        """Function decorator that prevents propagation if the current window handle is invalid."""
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if self.hwndMotionClientMain is None:
-                self.init()
+                self._init()
 
             if not win32gui.IsWindow(self.hwndMotionClientMain):
                 self._error()
@@ -153,7 +173,12 @@ class MotionClient:
             return func(self, *args, **kwargs)
         return wrapper
 
-    def ifReady(func):
+    def _ifReady(func):
+        """
+        Function decorator that prevents propagation if the simulator is not ready.
+        
+        See getReady for readiness criteria.
+        """
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
             if not self.getReady():
@@ -162,128 +187,203 @@ class MotionClient:
             return func(self, *args, **kwargs)
         return wrapper
 
-    @ifHandleValid
-    @ifReady
-    def setRollTarget(self, val: int):
-        SetSlider(self.hwndDialog, self.hwndSliderRoll, val, True)
+    @_ifHandleValid
+    def getReady(self) -> bool:
+        """Returns whether simulator is ready to accept movement commands."""
+        return (
+            (not self.getEmergencyStop()) and
+            (not self.getCanopyOpen())
+        )
 
-    @ifHandleValid
+    @_ifReady
+    def setRollTarget(self, val: int):
+        """
+        Sets target roll position in degrees.
+        
+        See getRollMax and getRollMin for input range.
+        """
+        _SetSlider(self.hwndDialog, self.hwndSliderRoll, val, True)
+
+    @_ifHandleValid
     def getRollTarget(self) -> int:
+        """Gets target roll position in degrees."""
         return win32gui.SendMessage(self.hwndSliderRoll, commctrl.TBM_GETPOS, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getRollMax(self) -> int:
+        """Gets maximum roll position in degrees."""
         return win32gui.SendMessage(self.hwndSliderRoll, commctrl.TBM_GETRANGEMAX, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getRollMin(self) -> int:
+        """Gets minimum roll position in degrees."""
         return win32gui.SendMessage(self.hwndSliderRoll, commctrl.TBM_GETRANGEMIN, 0, 0)
 
-    @ifHandleValid
-    @ifReady
+    @_ifReady
     def setPitchTarget(self, val: int):
-        SetSlider(self.hwndDialog, self.hwndSliderPitch, val, False)
+        """
+        Sets target pitch position in degrees.
+        
+        See getPitchMax and getPitchMin for input range.
+        """
+        _SetSlider(self.hwndDialog, self.hwndSliderPitch, val, False)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getPitchTarget(self) -> int:
+        """Gets target pitch position in degrees."""
         return win32gui.SendMessage(self.hwndSliderPitch, commctrl.TBM_GETPOS, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getPitchMax(self) -> int:
+        """Gets maximum pitch position in degrees."""
         return win32gui.SendMessage(self.hwndSliderPitch, commctrl.TBM_GETRANGEMAX, 0, 0)
         
-    @ifHandleValid
+    @_ifHandleValid
     def getPitchMin(self) -> int:
+        """Gets minimum pitch position in degrees."""
         return win32gui.SendMessage(self.hwndSliderPitch, commctrl.TBM_GETRANGEMIN, 0, 0)
 
-    # For some reason function decorators arent working properly with this
-    def _getCheckboxBool(self, hwnd) -> bool:
-        return bool(win32gui.SendMessage(hwnd, win32con.BM_GETCHECK, 0, 0))
-
-    @ifHandleValid
+    @_ifHandleValid
     def getLeftRaised(self):
-        return self._getCheckboxBool(self.hwndStatusLeftRaised)
+        """Gets whether the left hydraulic lift has reached the highest position."""
+        return _GetCheckboxBool(self.hwndStatusLeftRaised)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getRightRaised(self) -> bool:
-        return self._getCheckboxBool(self.hwndStatusRightRaised)
+        """Gets whether the right hydraulic lift has reached the highest position."""
+        return _GetCheckboxBool(self.hwndStatusRightRaised)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getLowered(self) -> bool:
-        return self._getCheckboxBool(self.hwndStatusLowered)
+        """Gets whether the both hydraulic lifts are at the lowest position."""
+        return _GetCheckboxBool(self.hwndStatusLowered)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getEmergencyStop(self) -> bool:
-        return self._getCheckboxBool(self.hwndStatusEmergencyStop)
+        """Gets whether the emergency stop button is pressed inwards."""
+        return _GetCheckboxBool(self.hwndStatusEmergencyStop)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getCanopyOpen(self) -> bool:
-        return self._getCheckboxBool(self.hwndStatusCanopyOpen)
+        """
+        Gets whether the canopy is open.
+        
+        Note that this does not indicate whether the canopy is locked.
+        There is currently no way to detect this.
+        """
+        return _GetCheckboxBool(self.hwndStatusCanopyOpen)
 
-    @ifHandleValid
+    @_ifHandleValid
     def liftRaise(self):
+        """Initiates the lifting process."""
         win32gui.SendMessage(self.hwndButtonRaise, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def liftStop(self):
+        """Interrupts the lifting process."""
         win32gui.SendMessage(self.hwndButtonLiftStop, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def liftLower(self):
+        """Initiates the lowering process."""
         win32gui.SendMessage(self.hwndButtonLower, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def start(self):
+        """
+        Prepares roll and pitch rotation.
+        Requires the lifting process be complete.
+        
+        Despite the name of this function (which matches the button),
+        run must still be triggered to begin moving.
+        """
         win32gui.SendMessage(self.hwndButtonStart, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def run(self):
+        """
+        Activate roll and pitch rotation.
+        Requires start to have been executed.
+        """
         win32gui.SendMessage(self.hwndButtonRun, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def freeze(self):
+        """Locks current target rotation."""
         win32gui.SendMessage(self.hwndButtonFreeze, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def stop(self):
+        """Returns simulator to neutral rotation and halts further movement."""
         win32gui.SendMessage(self.hwndButtonStop, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def forceRaised(self):
+        """
+        Forces simulator into raised state. (?)
+
+        This is for troubleshooting and is not necessary to activate under normal circumstances.
+        """
         win32gui.SendMessage(self.hwndButtonForceRaised, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def counterweightFwd(self):
+        """
+        Manually moves the counterweight forwards (towards the cabin).
+
+        This is for troubleshooting and is not necessary to activate under normal circumstances.
+        """
         win32gui.SendMessage(self.hwndButtonCounterweightFwd, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def counterweightBwd(self):
+        """
+        Manually moves the counterweight backwards (towards the tail).
+
+        This is for troubleshooting and is not necessary to activate under normal circumstances.
+        """
         win32gui.SendMessage(self.hwndButtonCounterweightBwd, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def home(self):
+        """Sets target roll and pitch to 0."""
         win32gui.SendMessage(self.hwndButtonHome, win32con.BM_CLICK, 0, 0)
 
-    @ifHandleValid
+    @_ifHandleValid
     def getPitchReal(self) -> float:
+        """Get real pitch measurement."""
         return float(win32gui.GetWindowText(self.hwndValuePitch))
 
-    @ifHandleValid
+    @_ifHandleValid
     def getRollReal(self) -> float:
+        """Get real roll measurement."""
         return float(win32gui.GetWindowText(self.hwndValueRoll))
 
-    @ifHandleValid
+    @_ifHandleValid
     def getLiftReal(self) -> float:
+        """Get real lift measurement. (?)"""
         return float(win32gui.GetWindowText(self.hwndValueLift))
 
-    @ifHandleValid
-    def getLogRange(self, low: int=None, high: int=None) -> list[str]:
-        return GetListBoxRange(self.hwndLog, low, high)
+    @_ifHandleValid
+    def getLogRange(self, low: int=0, high: int=None) -> list[str]:
+        """
+        Gets range of log messages.
+        
+        If low is undefined, it will be set to 0.
+        If high is undefined, it will be set to the last element of the list.
+        Both indices are inclusive.
+        """
+        return _GetListBoxRange(self.hwndLog, low, high)
 
     # =========================================================================
 
-    @ifHandleValid
+    @_ifHandleValid
     def status(self) -> dict:
+        """
+        Compiles many of the status getters above into a serializable object.
+
+        This excludes any log output and min/max values as they would be redundant to save.
+        """
         return {
             "canopyOpen": self.getCanopyOpen(),
             "emergencyStop": self.getEmergencyStop(),
