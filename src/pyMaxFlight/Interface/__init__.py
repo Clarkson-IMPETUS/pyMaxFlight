@@ -4,6 +4,7 @@ try:
     import win32process
     import win32con
     import commctrl
+    import ctypes
 except:
     raise ModuleNotFoundError("The Interface submodule requires pywin32: pip install pywin32")
 
@@ -66,10 +67,13 @@ def _SetSlider(hwndDialog: HWND, hwndSlider: HWND, val: float, horizontal: bool=
         hwndSlider
     )
 
-    retReleasedCapture = win32gui.PostMessage(
+    # For some reason doing this with win32gui was giving errors
+    # Doesn't require another external library so ¯\_(ツ)_/¯
+    retReleasedCapture = ctypes.windll.user32.PostMessageA(
         hwndSlider,
         commctrl.NM_RELEASEDCAPTURE,
-        0, 0
+        None,
+        None
     )
 
 
@@ -219,6 +223,8 @@ class MotionClient:
         """Gets minimum roll position in degrees."""
         return win32gui.SendMessage(self.hwndSliderRoll, commctrl.TBM_GETRANGEMIN, 0, 0)
 
+    # For some reason the display value in MotionClient and the slider position
+    # are negative to each other. To match that, we negate it here too
     @_ifReady
     def setPitchTarget(self, val: int):
         """
@@ -226,12 +232,12 @@ class MotionClient:
         
         See getPitchMax and getPitchMin for input range.
         """
-        _SetSlider(self.hwndDialog, self.hwndSliderPitch, val, False)
+        _SetSlider(self.hwndDialog, self.hwndSliderPitch, -val, False)
 
     @_ifHandleValid
     def getPitchTarget(self) -> int:
         """Gets target pitch position in degrees."""
-        return win32gui.SendMessage(self.hwndSliderPitch, commctrl.TBM_GETPOS, 0, 0)
+        return -win32gui.SendMessage(self.hwndSliderPitch, commctrl.TBM_GETPOS, 0, 0)
 
     @_ifHandleValid
     def getPitchMax(self) -> int:
