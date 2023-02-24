@@ -1,11 +1,16 @@
 # pyMaxFlight
-Python module for interfacing with and processing data from the MaxFlight Motion Client
+Python module for interfacing with the MaxFlight Motion Client.
 
-# Documentation
+<https://pymaxflight.readthedocs.io/en/latest/>
 
-## Local Testing
+## Updating Documentation
 
 ```bash
-python3 -m handsdown --external `git config --get remote.origin.url` --theme=material && python3 -m mkdocs build
+rm -R docs && rm -R site && python3 -m handsdown --external `git config --get remote.origin.url` --create-configs --exclude src/pyMaxFlight/Interface/__init__.py --cleanup && python3 -m mkdocs build
+```
+
+Afterwards, serve to test locally:
+
+```bash
 serve site
 ```
