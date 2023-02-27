@@ -1,6 +1,6 @@
 # Pymaxflight
 
-[Pymaxflight Index](../../README.md#pymaxflight-index) /
+[pyMaxFlight Index](../../README.md#pymaxflight-index) /
 `src` /
 Pymaxflight
 
