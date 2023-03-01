@@ -1,12 +1,9 @@
-try:
-    import win32api
-    import win32gui
-    import win32process
-    import win32con
-    import commctrl
-    import ctypes
-except:
-    raise ModuleNotFoundError("The Interface submodule requires pywin32: pip install pywin32")
+import win32api
+import win32gui
+import win32process
+import win32con
+import commctrl
+import ctypes
 
 import functools
 from typing import Iterator
@@ -199,7 +196,7 @@ class MotionClient:
             (not self.getCanopyOpen())
         )
 
-    @_ifReady
+    @_ifHandleValid
     def setRollTarget(self, val: int):
         """
         Sets target roll position in degrees.
@@ -225,7 +222,7 @@ class MotionClient:
 
     # For some reason the display value in MotionClient and the slider position
     # are negative to each other. To match that, we negate it here too
-    @_ifReady
+    @_ifHandleValid
     def setPitchTarget(self, val: int):
         """
         Sets target pitch position in degrees.
