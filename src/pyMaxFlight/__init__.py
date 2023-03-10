@@ -158,17 +158,25 @@ class MotionClient:
         self.hwndMotionClientMain = None
         self._pid_cache = None
 
+    @property
+    def isMotionClientOpen(self) -> bool:
+        """True if Motion Client is open, otherwise False."""
+        if self.hwndMotionClientMain is None:
+            self._init()
+
+        if not win32gui.IsWindow(self.hwndMotionClientMain):
+            return False
+
+        if not (self._getPID() == self._pid_cache):
+            return False
+        
+        return True
+
     def _ifHandleValid(func):
         """Function decorator that prevents propagation if the current window handle is invalid."""
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if self.hwndMotionClientMain is None:
-                self._init()
-
-            if not win32gui.IsWindow(self.hwndMotionClientMain):
-                self._error()
-
-            if not (self._getPID() == self._pid_cache):
+            if not self.isMotionClientOpen:
                 self._error()
 
             return func(self, *args, **kwargs)
