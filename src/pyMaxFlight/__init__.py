@@ -162,7 +162,10 @@ class MotionClient:
     def isMotionClientOpen(self) -> bool:
         """True if Motion Client is open, otherwise False."""
         if self.hwndMotionClientMain is None:
-            self._init()
+            try:
+                self._init()
+            except Exception:
+                return False
 
         if not win32gui.IsWindow(self.hwndMotionClientMain):
             return False
