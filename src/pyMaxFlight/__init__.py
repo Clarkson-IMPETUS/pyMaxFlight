@@ -1,3 +1,4 @@
+import subprocess
 import win32api
 import win32gui
 import win32process
@@ -101,7 +102,7 @@ class MotionClient:
         if self.hwndMotionClientMain == 0:
             self._error()
 
-        self._pid_cache = self._getPID()
+        self._pid_cache = self._getWindowPID()
 
         hwndMDIClient   = win32gui.FindWindowEx(self.hwndMotionClientMain, None, "MDIClient", None)
 
@@ -144,8 +145,8 @@ class MotionClient:
         self.hwndValueRoll              = win32gui.FindWindowEx(self.hwndDialog, self.hwndValuePitch, "Static", None)
         self.hwndValueLift              = win32gui.FindWindowEx(self.hwndDialog, self.hwndValueRoll, "Static", None)
 
-    def _getPID(self):
-        """Gets process ID of Motion Client."""
+    def _getWindowPID(self):
+        """Gets process ID of Motion Client window."""
         return win32process.GetWindowThreadProcessId(self.hwndMotionClientMain)
 
     def _error(self):
@@ -159,7 +160,18 @@ class MotionClient:
         self._pid_cache = None
 
     @property
-    def isMotionClientOpen(self) -> bool:
+    def isProcessOpen(self) -> bool:
+        """True if Motion Client process is open, otherwise False."""
+        process_name = "MFMotionClient.exe"
+        process = subprocess.Popen(
+            f'tasklist /fi "imagename eq {process_name}" /fo csv /nh',
+            shell=True, stdout=subprocess.PIPE
+        )
+        output = process.communicate()[0].decode().strip()
+        return output.startswith(f'"{process_name}"')
+
+    @property
+    def isMainWindowOpen(self) -> bool:
         """True if Motion Client is open, otherwise False."""
         if self.hwndMotionClientMain is None:
             try:
@@ -170,7 +182,7 @@ class MotionClient:
         if not win32gui.IsWindow(self.hwndMotionClientMain):
             return False
 
-        if not (self._getPID() == self._pid_cache):
+        if not (self._getWindowPID() == self._pid_cache):
             return False
         
         return True
@@ -179,7 +191,7 @@ class MotionClient:
         """Function decorator that prevents propagation if the current window handle is invalid."""
         @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
-            if not self.isMotionClientOpen:
+            if not self.isMainWindowOpen:
                 self._error()
 
             return func(self, *args, **kwargs)

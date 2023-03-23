@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="pyMaxFlight-IMPETUS",
-    version="1.1.1",
+    version="1.1.2",
     author="Joseph Judge",
     author_email="judgejc@clarkson.edu",
     description="Python module for interfacing with the MaxFlight Motion Client",
