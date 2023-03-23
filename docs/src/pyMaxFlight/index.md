@@ -34,7 +34,8 @@ Pymaxflight
     - [MotionClient().getRollReal](#motionclient()getrollreal)
     - [MotionClient().getRollTarget](#motionclient()getrolltarget)
     - [MotionClient().home](#motionclient()home)
-    - [MotionClient().isMotionClientOpen](#motionclient()ismotionclientopen)
+    - [MotionClient().isMainWindowOpen](#motionclient()ismainwindowopen)
+    - [MotionClient().isProcessOpen](#motionclient()isprocessopen)
     - [MotionClient().liftLower](#motionclient()liftlower)
     - [MotionClient().liftRaise](#motionclient()liftraise)
     - [MotionClient().liftStop](#motionclient()liftstop)
@@ -47,7 +48,7 @@ Pymaxflight
 
 ## MotionClient
 
-[Show source in __init__.py:77](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L77)
+[Show source in __init__.py:78](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L78)
 
 Provides an interface to the MaxFlight Motion Client.
 
@@ -63,7 +64,7 @@ class MotionClient:
 
 ### MotionClient().counterweightBwd
 
-[Show source in __init__.py:349](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L349)
+[Show source in __init__.py:364](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L364)
 
 Manually moves the counterweight backwards (towards the tail).
 
@@ -79,7 +80,7 @@ def counterweightBwd(self):
 
 ### MotionClient().counterweightFwd
 
-[Show source in __init__.py:340](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L340)
+[Show source in __init__.py:355](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L355)
 
 Manually moves the counterweight forwards (towards the cabin).
 
@@ -95,7 +96,7 @@ def counterweightFwd(self):
 
 ### MotionClient().forceRaised
 
-[Show source in __init__.py:331](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L331)
+[Show source in __init__.py:346](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L346)
 
 Forces simulator into raised state. (?)
 
@@ -111,7 +112,7 @@ def forceRaised(self):
 
 ### MotionClient().freeze
 
-[Show source in __init__.py:321](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L321)
+[Show source in __init__.py:336](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L336)
 
 Locks current target rotation.
 
@@ -125,7 +126,7 @@ def freeze(self):
 
 ### MotionClient().getCanopyOpen
 
-[Show source in __init__.py:277](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L277)
+[Show source in __init__.py:292](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L292)
 
 Gets whether the canopy is open.
 
@@ -142,7 +143,7 @@ def getCanopyOpen(self) -> bool:
 
 ### MotionClient().getEmergencyStop
 
-[Show source in __init__.py:272](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L272)
+[Show source in __init__.py:287](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L287)
 
 Gets whether the emergency stop button is pressed inwards.
 
@@ -156,7 +157,7 @@ def getEmergencyStop(self) -> bool:
 
 ### MotionClient().getLeftRaised
 
-[Show source in __init__.py:257](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L257)
+[Show source in __init__.py:272](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L272)
 
 Gets whether the left hydraulic lift has reached the highest position.
 
@@ -170,7 +171,7 @@ def getLeftRaised(self):
 
 ### MotionClient().getLiftReal
 
-[Show source in __init__.py:373](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L373)
+[Show source in __init__.py:388](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L388)
 
 Get real lift measurement. (?)
 
@@ -184,7 +185,7 @@ def getLiftReal(self) -> float:
 
 ### MotionClient().getLogRange
 
-[Show source in __init__.py:378](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L378)
+[Show source in __init__.py:393](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L393)
 
 Gets range of log messages.
 
@@ -202,7 +203,7 @@ def getLogRange(self, low: int = 0, high: int = None) -> list[str]:
 
 ### MotionClient().getLowered
 
-[Show source in __init__.py:267](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L267)
+[Show source in __init__.py:282](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L282)
 
 Gets whether the both hydraulic lifts are at the lowest position.
 
@@ -216,7 +217,7 @@ def getLowered(self) -> bool:
 
 ### MotionClient().getPitchMax
 
-[Show source in __init__.py:247](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L247)
+[Show source in __init__.py:262](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L262)
 
 Gets maximum pitch position in degrees.
 
@@ -230,7 +231,7 @@ def getPitchMax(self) -> int:
 
 ### MotionClient().getPitchMin
 
-[Show source in __init__.py:252](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L252)
+[Show source in __init__.py:267](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L267)
 
 Gets minimum pitch position in degrees.
 
@@ -244,7 +245,7 @@ def getPitchMin(self) -> int:
 
 ### MotionClient().getPitchReal
 
-[Show source in __init__.py:363](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L363)
+[Show source in __init__.py:378](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L378)
 
 Get real pitch measurement.
 
@@ -258,7 +259,7 @@ def getPitchReal(self) -> float:
 
 ### MotionClient().getPitchTarget
 
-[Show source in __init__.py:242](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L242)
+[Show source in __init__.py:257](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L257)
 
 Gets target pitch position in degrees.
 
@@ -272,7 +273,7 @@ def getPitchTarget(self) -> int:
 
 ### MotionClient().getReady
 
-[Show source in __init__.py:199](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L199)
+[Show source in __init__.py:214](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L214)
 
 Returns whether simulator is ready to accept movement commands.
 
@@ -286,7 +287,7 @@ def getReady(self) -> bool:
 
 ### MotionClient().getRightRaised
 
-[Show source in __init__.py:262](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L262)
+[Show source in __init__.py:277](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L277)
 
 Gets whether the right hydraulic lift has reached the highest position.
 
@@ -300,7 +301,7 @@ def getRightRaised(self) -> bool:
 
 ### MotionClient().getRollMax
 
-[Show source in __init__.py:221](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L221)
+[Show source in __init__.py:236](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L236)
 
 Gets maximum roll position in degrees.
 
@@ -314,7 +315,7 @@ def getRollMax(self) -> int:
 
 ### MotionClient().getRollMin
 
-[Show source in __init__.py:226](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L226)
+[Show source in __init__.py:241](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L241)
 
 Gets minimum roll position in degrees.
 
@@ -328,7 +329,7 @@ def getRollMin(self) -> int:
 
 ### MotionClient().getRollReal
 
-[Show source in __init__.py:368](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L368)
+[Show source in __init__.py:383](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L383)
 
 Get real roll measurement.
 
@@ -342,7 +343,7 @@ def getRollReal(self) -> float:
 
 ### MotionClient().getRollTarget
 
-[Show source in __init__.py:216](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L216)
+[Show source in __init__.py:231](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L231)
 
 Gets target roll position in degrees.
 
@@ -356,7 +357,7 @@ def getRollTarget(self) -> int:
 
 ### MotionClient().home
 
-[Show source in __init__.py:358](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L358)
+[Show source in __init__.py:373](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L373)
 
 Sets target roll and pitch to 0.
 
@@ -368,9 +369,9 @@ def home(self):
     ...
 ```
 
-### MotionClient().isMotionClientOpen
+### MotionClient().isMainWindowOpen
 
-[Show source in __init__.py:161](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L161)
+[Show source in __init__.py:173](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L173)
 
 True if Motion Client is open, otherwise False.
 
@@ -378,13 +379,27 @@ True if Motion Client is open, otherwise False.
 
 ```python
 @property
-def isMotionClientOpen(self) -> bool:
+def isMainWindowOpen(self) -> bool:
+    ...
+```
+
+### MotionClient().isProcessOpen
+
+[Show source in __init__.py:162](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L162)
+
+True if Motion Client process is open, otherwise False.
+
+#### Signature
+
+```python
+@property
+def isProcessOpen(self) -> bool:
     ...
 ```
 
 ### MotionClient().liftLower
 
-[Show source in __init__.py:297](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L297)
+[Show source in __init__.py:312](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L312)
 
 Initiates the lowering process.
 
@@ -398,7 +413,7 @@ def liftLower(self):
 
 ### MotionClient().liftRaise
 
-[Show source in __init__.py:287](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L287)
+[Show source in __init__.py:302](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L302)
 
 Initiates the lifting process.
 
@@ -412,7 +427,7 @@ def liftRaise(self):
 
 ### MotionClient().liftStop
 
-[Show source in __init__.py:292](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L292)
+[Show source in __init__.py:307](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L307)
 
 Interrupts the lifting process.
 
@@ -426,7 +441,7 @@ def liftStop(self):
 
 ### MotionClient().run
 
-[Show source in __init__.py:313](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L313)
+[Show source in __init__.py:328](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L328)
 
 Activate roll and pitch rotation.
 Requires start to have been executed.
@@ -441,7 +456,7 @@ def run(self):
 
 ### MotionClient().setPitchTarget
 
-[Show source in __init__.py:233](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L233)
+[Show source in __init__.py:248](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L248)
 
 Sets target pitch position in degrees.
 
@@ -457,7 +472,7 @@ def setPitchTarget(self, val: int):
 
 ### MotionClient().setRollTarget
 
-[Show source in __init__.py:207](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L207)
+[Show source in __init__.py:222](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L222)
 
 Sets target roll position in degrees.
 
@@ -473,7 +488,7 @@ def setRollTarget(self, val: int):
 
 ### MotionClient().start
 
-[Show source in __init__.py:302](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L302)
+[Show source in __init__.py:317](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L317)
 
 Prepares roll and pitch rotation.
 Requires the lifting process be complete.
@@ -491,7 +506,7 @@ def start(self):
 
 ### MotionClient().status
 
-[Show source in __init__.py:391](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L391)
+[Show source in __init__.py:406](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L406)
 
 Compiles many of the status getters above into a serializable object.
 
@@ -507,7 +522,7 @@ def status(self) -> dict:
 
 ### MotionClient().stop
 
-[Show source in __init__.py:326](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L326)
+[Show source in __init__.py:341](https://github.com/Clarkson-IMPETUS/pyMaxFlight/blob/main/src/pyMaxFlight/__init__.py#L341)
 
 Returns simulator to neutral rotation and halts further movement.
 
